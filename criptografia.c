@@ -308,17 +308,52 @@ void funcao_complexa(char seq_8[], char k1[], char k2[], char resultado[]){
     }
     permutacao_inv(resultado);
     printar(resultado,8);
+    printf("\n");
+}
+
+void funcao_complexa2(char seq_8[], char k1[], char k2[], char resultado[]){
+    permutacao_fk(seq_8);//permutacao inicial
+    char left4bits[4], right4bits[4]; //salvando para utilizar no final da funcao
+    for(i=0;i<4;i++){
+        left4bits[i]=seq_8[i];
+        right4bits[i]=seq_8[i+4];
+    }
+    expansao(right4bits, seq_8);//expansao de 4 bits para 8
+    xor(seq_8, k2, 8);//xor com a k2
+    char seq_4[4], result[4], result2[4];
+    s0_s1(seq_8, seq_4); //s0 e s1 e junta para p4
+    for(i=0;i<4;i++){
+        result[i]=seq_4[P4[i]];
+    } //aplica p4
+    xor(result, left4bits, 4);//xor com left4bits sai 4 bits
+    sw(result, right4bits);//troca left para right e vice versa, result=left, right4bits = right
+
+    //funcao complexa para k2
+    expansao(right4bits, seq_8);//expansao de 4 bits para 8
+    xor(seq_8, k1, 8);//xor com a k1
+    s0_s1(seq_8, seq_4); //s0 e s1 e junta para p4
+    for(i=0;i<4;i++){
+        result2[i]=seq_4[P4[i]];
+    } //aplica p4
+    xor(result2, result, 4);//xor com left4bits
+    for(i=0;i<4;i++){
+        resultado[i]=result2[i];
+        resultado[i+4]=right4bits[i];
+    }
+    permutacao_inv(resultado);
+    printar(resultado,8);
+    printf("\n");
 }
 
 
 void cifrar(char chave[], char bloco[], char k1[], char k2[], char results[]){
-    fk1_e_k2(chave, k1, k2); //gera chave k1 e k2 - certo
-    
+    fk1_e_k2(chave, k1, k2); //gera chave k1 e k2  
     funcao_complexa(bloco, k1, k2, results); //funcao_complexa+sw+funcao_complexa+ip inversa
 }
 
-void decifriar(char chave[], char bloco[], char k1[], char k2[], char results[]){
-    fk1_e_k2(chave, k1, k2); //gera chave k1 e k2 - certo
+void decifrar(char chave[], char bloco[], char k1[], char k2[], char results[]){
+    fk1_e_k2(chave, k1, k2); //gera chave k1 e k2
+    funcao_complexa2(bloco, k1, k2, results); //funcao_complexa+sw+funcao_complexa+ip inversa
 }
 
 
@@ -349,7 +384,7 @@ int main(){
             cifrar(K, B, K1, K2, R);
         }
         else if(op[0]=='d' || op[0]=='D'){
-            printf("teste");
+            decifrar(K, B, K1, K2, R);
         }
         
     }
