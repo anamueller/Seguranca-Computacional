@@ -18,6 +18,12 @@ int S1[4][4]= {{1,1,2,3},
                 {3,0,1,0},
                 {2,1,0,3}};
 
+void printar(char vetor[], int n){
+    for(i=0;i<n;i++){
+        printf("%c", vetor[i]);
+    }
+}
+
 void copy(char copiado[], char copia[], int tam){
     for(i=0;i<tam;i++){
         copia[i]=copiado[i];
@@ -79,6 +85,15 @@ void permutacao_fk(char chave[]){
     }
 }
 
+void permutacao_inv(char chave[]){
+    char aux[8];
+    copy(chave,aux,8);
+
+    for(i=0;i<8;i++){
+        chave[i]=aux[IP_inv[i]];
+    }
+}
+
 void expansao(char chave_4[], char chave_8[]){
     for(i=0;i<8;i++){
         chave_8[i]=chave_4[EP[i]];
@@ -87,14 +102,14 @@ void expansao(char chave_4[], char chave_8[]){
 
 void xor(char seq[], char chave[], int n){
     /*
-    |xor| 1 | 0 |
+    |xor| 1 | 0 | -> chave
     | 1 | 0 | 1 |
     | 0 | 1 | 0 |
     */
     char aux[n];
     copy(seq, aux, n);
     for(i=0;i<n;i++){
-        if(aux[i]==1){
+        if(aux[i]=='1'){
             if(chave[i]=='1'){
                 seq[i]='0';
             }
@@ -102,7 +117,7 @@ void xor(char seq[], char chave[], int n){
                 seq[i]='1';
             }
         }
-        else if(aux[i]==0){
+        else if(aux[i]=='0'){
             if(chave[i]=='1'){
                 seq[i]='1';
             }
@@ -121,6 +136,7 @@ void s0_s1(char seq_8[], char seq_4[]){
     } //separando para irem para s0 e s1
     int L0, C0, L1, C1;
     //00=0, 01=1, 10=2, 11=3;
+    //linha de s0
     if(left[0]=='0'){
         if(left[3]=='0'){
             L0 = 0;
@@ -137,6 +153,25 @@ void s0_s1(char seq_8[], char seq_4[]){
             L0 = 3;
         }
     }
+    //coluna de s0
+    if(left[1]=='0'){
+        if(left[2]=='0'){
+            C0 = 0;
+        }
+        else if(left[2]=='1'){
+            C0 = 1;
+        }
+    }
+    else if(left[1]=='1'){
+        if(left[2]=='0'){
+            C0 = 2;
+        }
+        else if(left[2]=='1'){
+            C0 = 3;
+        }
+    }
+
+    //linha de s1
     if(right[0]=='0'){
         if(right[3]=='0'){
             L1 = 0;
@@ -154,7 +189,25 @@ void s0_s1(char seq_8[], char seq_4[]){
         }
     }
 
-    switch (S0[L0][L1])
+    //coluna de s1
+    if(right[1]=='0'){
+        if(right[2]=='0'){
+            C1 = 0;
+        }
+        else if(right[2]=='1'){
+            C1 = 1;
+        }
+    }
+    else if(right[1]=='1'){
+        if(right[1]=='0'){
+            C1 = 2;
+        }
+        else if(right[2]=='1'){
+            C1 = 3;
+        }
+    }
+
+    switch (S0[L0][C0])
     {
     case 0:
         left[0]='0';
@@ -180,7 +233,7 @@ void s0_s1(char seq_8[], char seq_4[]){
         break;
     }
 
-    switch (S1[L0][L1])
+    switch (S1[L1][C1])
     {
     case 0:
         right[0]='0';
@@ -213,7 +266,18 @@ void s0_s1(char seq_8[], char seq_4[]){
 
 }
 
-void funcao_complexa(char seq_8[], char k1[]){
+void sw(char left[], char right[]){ //left vira right e vice versa
+    char aux[4];
+    for(i=0;i<4;i++){
+        aux[i]=right[i];
+    }
+    for(i=0;i<4;i++){
+        right[i]=left[i];
+        left[i]=aux[i];
+    }
+}
+
+void funcao_complexa(char seq_8[], char k1[], char k2[], char resultado[]){
     permutacao_fk(seq_8);//permutacao inicial
     char left4bits[4], right4bits[4]; //salvando para utilizar no final da funcao
     for(i=0;i<4;i++){
@@ -222,21 +286,39 @@ void funcao_complexa(char seq_8[], char k1[]){
     }
     expansao(right4bits, seq_8);//expansao de 4 bits para 8
     xor(seq_8, k1, 8);//xor com a k1
-    char seq_4[4], result[4];
+    char seq_4[4], result[4], result2[4];
     s0_s1(seq_8, seq_4); //s0 e s1 e junta para p4
     for(i=0;i<4;i++){
         result[i]=seq_4[P4[i]];
     } //aplica p4
-    xor(seq_4, left4bits, 4);//xor com left4bits
-    //sai 4 bits
+    xor(result, left4bits, 4);//xor com left4bits sai 4 bits
+    sw(result, right4bits);//troca left para right e vice versa, result=left, right4bits = right
+
+    //funcao complexa para k2
+    expansao(right4bits, seq_8);//expansao de 4 bits para 8
+    xor(seq_8, k2, 8);//xor com a k2
+    s0_s1(seq_8, seq_4); //s0 e s1 e junta para p4
+    for(i=0;i<4;i++){
+        result2[i]=seq_4[P4[i]];
+    } //aplica p4
+    xor(result2, left4bits, 4);//xor com left4bits
+    for(i=0;i<4;i++){
+        resultado[i]=result2[i];
+        resultado[i+4]=right4bits[i];
+    }
+    permutacao_inv(resultado);
+    printar(resultado,8);
 }
 
-void cifrar(int chave[], int bloco[]){
-    //permutação inicial
-    //função complexa
-    //permutação de troca de duas metades
-    //função complexa dnv
-    //permutação inicial inversa
+
+void cifrar(char chave[], char bloco[], char k1[], char k2[], char results[]){
+    fk1_e_k2(chave, k1, k2); //gera chave k1 e k2 - certo
+    
+    funcao_complexa(bloco, k1, k2, results); //funcao_complexa+sw+funcao_complexa+ip inversa
+}
+
+void decifriar(char chave[], char bloco[], char k1[], char k2[], char results[]){
+    fk1_e_k2(chave, k1, k2); //gera chave k1 e k2 - certo
 }
 
 
@@ -262,28 +344,15 @@ int main(){
         for(int j=0;j<8;j++){ //ler o bloco
             scanf(" %c", &B[j]);
         }
-
-        //fazer a operação
+        
+        if(op[0]=='c' || op[0]=='C'){
+            cifrar(K, B, K1, K2, R);
+        }
+        else if(op[0]=='d' || op[0]=='D'){
+            printf("teste");
+        }
+        
     }
-
-    fk1_e_k2(K, K1, K2);
-    funcao_complexa(B, K1);
-
-    printf("\nchave k1\n");
-    for(i=0;i<8;i++){
-        printf("%c ", K1[i]);
-    }
-
-    printf("\nchave k2\n");
-    for(i=0;i<8;i++){
-        printf("%c ", K2[i]);
-    }
-
-    printf("\nchave B\n");
-    for(i=0;i<8;i++){
-        printf("%c ", B[i]);
-    }
-
 
     return 0;
 }
