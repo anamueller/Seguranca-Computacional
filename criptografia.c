@@ -1,6 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/*
+Código desenvolvido por Ana Clara Mueller Miranda aplicando o algoritmo de criptografia
+Simple DES (S-DES) em C.
+*/
+
+
+
 int P10[10] ={2,4,1,6,3,9,0,8,7,5};
 int P8[8] = {5,2,6,3,7,4,9,8};
 int P4[4] = {1,3,2,0};
