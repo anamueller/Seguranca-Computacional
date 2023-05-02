@@ -27,7 +27,7 @@ void rotacionar(char chave[]){
             aux1[i-1]=chave[i];
             aux2[i-1]=chave[i+5];
         }
-    }//rotação para k1
+    }//rotação de 1 para esquerda
 
     for(i=0;i<5;i++){
         chave[i]=aux1[i];
@@ -36,10 +36,23 @@ void rotacionar(char chave[]){
 
 }
 
-void fk1(char chave[], char chave_de_8[]){
-    rotacionar(chave);
+void fk1_e_k2(char chave[], char k1[], char k2[]){
+    permutacao(chave);
+    rotacionar(chave); //para k1
+
+    char aux[10];
+    for(i=0;i<10;i++){
+        aux[i]=chave[i];
+    } //copiando para usar em k2
+    rotacionar(aux);
+    rotacionar(aux); //k2 rotaciona 2 para esquerda após ls-1
+
     for(i=0;i<8;i++){
-        chave_de_8[i]=chave[P8[i]];
+        k1[i]=chave[P8[i]];
+    } //aplica p8
+
+    for(i=0;i<8;i++){
+        k2[i]=aux[P8[i]];
     } //aplica p8
 }
 
@@ -54,11 +67,12 @@ void cifrar(int chave[], int bloco[]){
 
 int main(){
     int L;
-    char op[1];
+    char op[1]; //escolha da operacao decifrar ou cifrar
     char K[10]; //chave
-    char B[8]; //sequência de bits do bloco a ser utilizado na operação
-    char R[8];
+    char B[8]; //sequência de bits do bloco a ser utilizado na operação na função complexa
+    char R[8]; //resultado final
     char K1[8]; //subchave depois de primeira geração de chave
+    char K2[8]; //subchave depois de primeira geração de chave
 
 
     scanf("%d", &L);
@@ -77,12 +91,16 @@ int main(){
         //fazer a operação
     }
 
-    permutacao(K);
-    fk1(K, K1);
+    fk1_e_k2(K, K1, K2);
 
-    printf("\nchave\n");
+    printf("\nchave k1\n");
     for(i=0;i<8;i++){
         printf("%c ", K1[i]);
+    }
+
+    printf("\nchave k2\n");
+    for(i=0;i<8;i++){
+        printf("%c ", K2[i]);
     }
 
 
