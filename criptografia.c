@@ -8,6 +8,15 @@ int EP[8] = {3,0,1,2,1,2,3,0};
 int IP[8] = {1,5,2,0,3,7,4,6};
 int IP_inv[8] = {3,0,2,4,6,1,7,5};
 int i;
+int S0[4][4]= {{1,0,3,2},
+                {3,2,1,0},
+                {0,2,1,3},
+                {3,1,3,2}};
+
+int S1[4][4]= {{1,1,2,3},
+                {2,0,1,3},
+                {3,0,1,0},
+                {2,1,0,3}};
 
 void copy(char copiado[], char copia[], int tam){
     for(i=0;i<tam;i++){
@@ -76,15 +85,15 @@ void expansao(char chave_4[], char chave_8[]){
     }
 }
 
-void xor(char seq[], char chave[]){
+void xor(char seq[], char chave[], int n){
     /*
     |xor| 1 | 0 |
     | 1 | 0 | 1 |
     | 0 | 1 | 0 |
     */
-    char aux[8];
-    copy(seq, aux, 8);
-    for(i=0;i<8;i++){
+    char aux[n];
+    copy(seq, aux, n);
+    for(i=0;i<n;i++){
         if(aux[i]==1){
             if(chave[i]=='1'){
                 seq[i]='0';
@@ -104,12 +113,104 @@ void xor(char seq[], char chave[]){
     }
 }
 
-void so_s1(char seq_8[]){
-    char aux1[4], aux2[4];
+void s0_s1(char seq_8[], char seq_4[]){
+    char left[4], right[4];
     for(i=0;i<4;i++){
-        aux1[i]=seq_8[i];
-        aux2[i]=seq_8[i+4];
+        left[i]=seq_8[i];
+        right[i]=seq_8[i+4];
     } //separando para irem para s0 e s1
+    int L0, C0, L1, C1;
+    //00=0, 01=1, 10=2, 11=3;
+    if(left[0]=='0'){
+        if(left[3]=='0'){
+            L0 = 0;
+        }
+        else if(left[3]=='1'){
+            L0 = 1;
+        }
+    }
+    else if(left[0]=='1'){
+        if(left[3]=='0'){
+            L0 = 2;
+        }
+        else if(left[3]=='1'){
+            L0 = 3;
+        }
+    }
+    if(right[0]=='0'){
+        if(right[3]=='0'){
+            L1 = 0;
+        }
+        else if(right[3]=='1'){
+            L1 = 1;
+        }
+    }
+    else if(right[0]=='1'){
+        if(right[3]=='0'){
+            L1 = 2;
+        }
+        else if(right[3]=='1'){
+            L1 = 3;
+        }
+    }
+
+    switch (S0[L0][L1])
+    {
+    case 0:
+        left[0]='0';
+        left[1]='0';
+        break;
+    
+    case 1:
+        left[0]='0';
+        left[1]='1';
+        break;
+    
+    case 2:
+        left[0]='1';
+        left[1]='0';
+        break;
+
+    case 3:
+        left[0]='1';
+        left[1]='1';
+        break;
+
+    default:
+        break;
+    }
+
+    switch (S1[L0][L1])
+    {
+    case 0:
+        right[0]='0';
+        right[1]='0';
+        break;
+    
+    case 1:
+        right[0]='0';
+        right[1]='1';
+        break;
+    
+    case 2:
+        right[0]='1';
+        right[1]='0';
+        break;
+
+    case 3:
+        right[0]='1';
+        right[1]='1';
+        break;
+
+    default:
+        break;
+    }
+
+    for(i=0;i<2;i++){
+        seq_4[i] = left[i];
+        seq_4[i+2] = right[i];
+    }
+
 }
 
 void funcao_complexa(char seq_8[], char k1[]){
@@ -120,10 +221,13 @@ void funcao_complexa(char seq_8[], char k1[]){
         right4bits[i]=seq_8[i+4];
     }
     expansao(right4bits, seq_8);//expansao de 4 bits para 8
-    xor(seq_8, k1);//xor com a k1
-    //s0 e s1
-    //junta p4
-    //xor
+    xor(seq_8, k1, 8);//xor com a k1
+    char seq_4[4], result[4];
+    s0_s1(seq_8, seq_4); //s0 e s1 e junta para p4
+    for(i=0;i<4;i++){
+        result[i]=seq_4[P4[i]];
+    } //aplica p4
+    xor(seq_4, left4bits, 4);//xor com left4bits
     //sai 4 bits
 }
 
