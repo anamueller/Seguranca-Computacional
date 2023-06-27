@@ -1,7 +1,7 @@
 #Leonardo Silva Pinto e Ana Clara Mueller Miranda
 #formato de execução do código:
 #python3 interface.py porta_destino porta_local
-#exemplo interface.py 3000 3000
+#exemplo: interface.py 3000 3000
 
 import sys
 import typing

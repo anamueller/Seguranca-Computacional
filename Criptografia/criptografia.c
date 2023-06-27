@@ -81,6 +81,8 @@ void fk1_e_k2(char chave[], char k1[], char k2[]){
     for(i=0;i<8;i++){
         k2[i]=aux[P8[i]];
     } //aplica p8
+
+    
 }
 
 void permutacao_fk(char chave[]){
@@ -361,6 +363,16 @@ void cifrar(char chave[], char bloco[], char k1[], char k2[], char results[]){
 void decifrar(char chave[], char bloco[], char k1[], char k2[], char results[]){
     fk1_e_k2(chave, k1, k2); //gera chave k1 e k2
     funcao_complexa2(bloco, k1, k2, results); //funcao_complexa+sw+funcao_complexa+ip inversa
+}
+
+void ECB(char chave[], char bloco[], char k1[], char k2[], char results[]){
+    //divide
+    //chama cifrar ou decifrar com o bloco dividido
+}
+
+void CCB(char chave[], char bloco[], char k1[], char k2[], char results[]){
+    //divide
+    //chama cifrar ou decifrar com o bloco dividido
 }
 
 
