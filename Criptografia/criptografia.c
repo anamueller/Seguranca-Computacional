@@ -3,7 +3,7 @@
 
 /*
 Código desenvolvido por Ana Clara Mueller Miranda aplicando o algoritmo de criptografia
-Simple DES (S-DES) em C.
+Simple DES (S-DES) em C. 
 */
 
 
